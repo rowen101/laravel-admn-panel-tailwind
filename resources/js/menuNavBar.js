@@ -2,36 +2,40 @@ import {
     mdiMenu,
     mdiClockOutline,
     mdiCloud,
+    mdiDownloadCircle,
+    mdiPrinterOutline,
     mdiCrop,
     mdiAccount,
     mdiCogOutline,
     mdiEmail,
     mdiLogout,
     mdiThemeLightDark,
-    mdiGithub
+    mdiGithub,
+    mdiHammerWrench
   } from '@mdi/js'
-  
+
   export default [
     {
-      icon: mdiMenu,
-      label: 'Sample menu',
+      icon: mdiHammerWrench,
+      label: 'Tools',
       menu: [
         {
-          icon: mdiClockOutline,
-          label: 'Item One'
-        },
-        {
-          icon: mdiCloud,
-          label: 'Item Two'
-        },
-        {
-          isDivider: true
-        },
-        {
           icon: mdiCrop,
-          label: 'Item Last'
-        }
-      ]
+          label: "Capture",
+        },
+        {
+          icon: mdiDownloadCircle,
+          label: "Download",
+        },
+        {
+          isDivider: true,
+        },
+        {
+          icon: mdiPrinterOutline,
+          label: "Print",
+          isPrint: true,
+        },
+      ],
     },
     {
       isCurrentUser: true,
@@ -52,11 +56,7 @@ import {
         {
           isDivider: true
         },
-        {
-          icon: mdiLogout,
-          label: 'Log Out',
-          isLogout: true
-        }
+
       ]
     },
     {
@@ -65,17 +65,17 @@ import {
       isDesktopNoLabel: true,
       isToggleLightDark: true
     },
-    {
-      icon: mdiGithub,
-      label: 'GitHub',
-      isDesktopNoLabel: true,
-      href: 'https://github.com/balajidharma/laravel-vue-admin-panel',
-      target: '_blank'
-    },
-    {
-      icon: mdiLogout,
-      label: 'Log out',
-      isDesktopNoLabel: true,
-      isLogout: true
-    }
+    // {
+    //   icon: mdiGithub,
+    //   label: 'GitHub',
+    //   isDesktopNoLabel: true,
+    //   href: 'https://github.com/balajidharma/laravel-vue-admin-panel',
+    //   target: '_blank'
+    // },
+    // {
+    //   icon: mdiLogout,
+    //   label: 'Log out',
+    //   isDesktopNoLabel: true,
+    //   isLogout: true
+    // }
   ]

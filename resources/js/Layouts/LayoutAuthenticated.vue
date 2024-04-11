@@ -25,7 +25,9 @@ const menuClick = (event, item) => {
   if (item.isToggleLightDark) {
     darkModeStore.set()
   }
-
+  if (item.isPrint) {
+    window.print();
+  }
   if (item.isLogout) {
     router.post(route('logout'))
   }
