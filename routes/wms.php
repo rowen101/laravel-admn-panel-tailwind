@@ -11,7 +11,7 @@ Route::group([
     Route::get('/', function () {
         return Inertia::render('Wms/Dashboard');
     })->name('dashboard');
-
+    Route::resource('customer-master', 'CustomerMasController');
 
 
 });
