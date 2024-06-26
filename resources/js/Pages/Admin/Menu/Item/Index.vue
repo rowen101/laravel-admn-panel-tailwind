@@ -136,7 +136,7 @@ function destroy(id) {
 
           <tbody>
             <template v-for="item in items">
-              <MenuItemList :item="item" :menu="menu" :can="can" :level=0 />
+              <MenuItemList :item="item"  :menu="menu" :can="can" :level=0 />
             </template>
           </tbody>
         </table>

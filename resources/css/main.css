@@ -6,3 +6,9 @@
 @import "_progress.css";
 @import "_scrollbars.css";
 @import "_table.css";
+
+@layer base {
+    .pl-76 {
+      padding-left:19rem;
+    }
+  }

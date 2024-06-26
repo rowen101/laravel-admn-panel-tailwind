@@ -2,21 +2,13 @@
 
 namespace App\Http\Controllers\Operation;
 
-use App\Models\Role;
-
-use BalajiDharma\LaravelAdminCore\Actions\User\CreateUser;
-use BalajiDharma\LaravelAdminCore\Actions\User\UpdateUser;
-use BalajiDharma\LaravelAdminCore\Requests\StoreUserRequest;
-use BalajiDharma\LaravelAdminCore\Requests\UpdateUserRequest;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
 use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
-class DashboardController extends Controller
+class ListController extends Controller
 {
     public function __construct()
     {
@@ -25,12 +17,8 @@ class DashboardController extends Controller
         $this->middleware('can:user edit', ['only' => ['edit', 'update']]);
         $this->middleware('can:user delete', ['only' => ['destroy']]);
     }
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-
         $users = (new User)->newQuery();
 
         if (request()->has('search')) {
@@ -49,11 +37,11 @@ class DashboardController extends Controller
             $users->latest();
         }
 
-        $users = $users->paginate(config('dashboard.paginate.per_page'))
-                    ->onEachSide(config('dashboard.paginate.each_side'))
+        $users = $users->paginate(config('list.paginate.per_page'))
+                    ->onEachSide(config('list.paginate.each_side'))
                     ->appends(request()->query());
 
-        return Inertia::render('Operation/Dashboard', [
+        return Inertia::render('Operation/Asset/List/Index', [
             'users' => $users,
             'filters' => request()->all('search'),
             'can' => [
@@ -62,54 +50,5 @@ class DashboardController extends Controller
                 'delete' => Auth::user()->can('user delete'),
             ],
         ]);
-        //return Inertia::render('Operation/Dashboard');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

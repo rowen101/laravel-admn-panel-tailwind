@@ -80,10 +80,6 @@ const activeInactiveStyle = computed(
         w="w-16"
         :size="18"
       />
-      <span
-        class="grow text-ellipsis line-clamp-1"
-        :class="[{ 'pr-12': !hasDropdown }, activeInactiveStyle]"
-      >{{ item.name }}</span>
       <BaseIcon
         v-if="hasDropdown"
         :path="isDropdownActive ? mdiMinus : mdiPlus"
@@ -91,6 +87,11 @@ const activeInactiveStyle = computed(
         :class="activeInactiveStyle"
         w="w-12"
       />
+      <span
+        class="grow text-ellipsis line-clamp-1"
+        :class="[{ 'pr-12': !hasDropdown }, activeInactiveStyle]"
+      >{{ item.name }}</span>
+
     </component>
     <AsideMenuList
       v-if="hasDropdown"
