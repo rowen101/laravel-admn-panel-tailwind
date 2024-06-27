@@ -1,207 +1,222 @@
 <script setup>
-import { Head, Link, useForm } from "@inertiajs/vue3"
-import {ref} from "vue"
+import { Head, Link, useForm, usePage, router } from "@inertiajs/vue3";
+import { ref } from "vue";
 import {
-  mdiAccountKey,
-  mdiPlus,
-  mdiSquareEditOutline,
-  mdiTrashCan,
-  mdiAlertBoxOutline,
-} from "@mdi/js"
-import LayoutAuthenticated from "@/Layouts/LayoutAuthenticated.vue"
-import SectionMain from "@/Components/SectionMain.vue"
-import SectionTitleLineWithButton from "@/Components/SectionTitleLineWithButton.vue"
-import BaseButton from "@/Components/BaseButton.vue"
-import CardBox from "@/Components/CardBox.vue"
-import BaseButtons from "@/Components/BaseButtons.vue"
-import NotificationBar from "@/Components/NotificationBar.vue"
-import Pagination from "@/Components/Admin/Pagination.vue"
-import Sort from "@/Components/Admin/Sort.vue"
+    mdiAccountKey,
+    mdiPlus,
+    mdiSquareEditOutline,
+    mdiTrashCan,
+    mdiAlertBoxOutline,
+    mdiTableBorder,
+    mdiCloudDownloadOutline,
+    mdiFileEditOutline,
+    mdiDeleteCircleOutline,
+} from "@mdi/js";
+import LayoutAuthenticated from "@/Layouts/LayoutAuthenticated.vue";
+import SectionMain from "@/Components/SectionMain.vue";
+import SectionTitleLineWithButton from "@/Components/SectionTitleLineWithButton.vue";
+import BaseButton from "@/Components/BaseButton.vue";
+import CardBox from "@/Components/CardBox.vue";
+import BaseButtons from "@/Components/BaseButtons.vue";
+import NotificationBar from "@/Components/NotificationBar.vue";
+import Pagination from "@/Components/Admin/Pagination.vue";
+import Sort from "@/Components/Admin/Sort.vue";
+import CoreTable from "@/Components/CoreTable.vue"; // Ensure this is correctly imported
+import FormField from "@/Components/FormField.vue";
+import FormControl from "@/Components/FormControl.vue";
+import CardBoxModal from "@/Components/CardBoxModal.vue";
 
+const props = defineProps({ users: Array });
+const title = "List Assets"
+const dialogVisible = ref(false);
+const isAddProduct = ref(false);
+const editMode = ref(false);
+//products from data
+const id = ref("");
+const name = ref("");
+const email = ref("");
 
-const props = defineProps({ data: Array });
-const title = "List All"
+const productImages = ref([]);
+//open add modal
+const openAddModal = () => {
+    isAddProduct.value = true;
+    dialogVisible.value = true;
+    editMode.value = false;
+};
+
+//add product method
+const AddProduct = async () => {
+
+    const formData = new FormData();
+    formData.append("email", email.value);
+    formData.append("name", name.value);
+    clea();
+    try {
+        await router.post("products/store", formData, {
+            onSuccess: (page) => {
+                Swal.fire({
+                    toast: true,
+                    icon: "success",
+                    position: "top-end",
+                    showConfirmButton: false,
+                    title: page.props.flash.success,
+                    // title:'Created Product Success'
+                });
+                dialogVisible.value = false;
+                resetFormData();
+            },
+        });
+    } catch (err) {
+        consol.log(err);
+    }
+};
+
+//rest data after added
+const resetFormData = () => {
+    id.value = "";
+    name.value = "";
+    email.value = "";
+};
+
+//Edit
+const openEditModal = (item) => {
+    console.log("Editing row:", item);
+    if (item) {
+        editMode.value = true;
+        isAddProduct.value = false;
+        dialogVisible.value = true;
+
+        // Update data
+        id.value = item.id;
+        email.value = item.email;
+        name.value = item.name;
+    } else {
+        console.error("Row data is undefined");
+    }
+};
+
+//delete
+const deleteItem = (item, index) => {
+    Swal.fire({
+        toast: true,
+        icon: "warning",
+        showConfirmButton: true,
+        title: "Are you sure",
+        text: "This actions cannot be undo!",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        cancelButtonText: "no",
+        confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            try {
+                router.delete("list/" + item.id, {
+                    onSuccess: (page) => {
+                        this.delete(item, index);
+                        Swal.fire({
+                            toast: true,
+                            icon: "success",
+                            position: "top-end",
+                            showConfirmButton: false,
+                            title: page.props.flash.success,
+                        });
+                    },
+                });
+            } catch (err) {
+                console.log(err);
+            }
+        }
+    });
+};
+
 const headers = [
-
-  { label: "Action", type: 'slot' },
-  { label: "Inventory ID", fieldName: "inventory_id" },
-  { label: "Location", fieldName: "loccode" },
-  { label: "Label No", fieldName: "labelno" },
-  { label: "Item Code", fieldName: "itemcode", },
-  { label: "Description", fieldName: "description" },
-  { label: "UOM", fieldName: "quantityuom" },
-  { label: "Quantity", fieldName: "quantity" },
-  { label: "CC Qty", fieldName: "cyclecountqty" },
-  { label: "Lot Num", fieldName: "lotnum" },
-  { label: "Expiry Date", fieldName: "expirydate" },
-  { label: "Counted by", fieldName: "countedby" },
-  { label: "Count date", fieldName: "countdate" },
+    { label: "Email", fieldName: "email" },
+    { label: "Name", fieldName: "name" },
+    { label: "Action", type: "slot" },
 ];
 
-let users = ref(props.data ?? [])
-
-
-// const props = defineProps({
-//   users: {
-//     type: Object,
-//     default: () => ({}),
-//   },
-//   filters: {
-//     type: Object,
-//     default: () => ({}),
-//   },
-//   can: {
-//     type: Object,
-//     default: () => ({}),
-//   },
-// })
-
-// const form = useForm({
-//   search: props.filters.search,
-// })
-
-const deleteCount = () => {
-  console.log('Deleted')
-}
-const formDelete = useForm({})
+const formDelete = useForm({});
 
 function destroy(id) {
-  if (confirm("Are you sure you want to delete?")) {
-    formDelete.delete(route("admin.user.destroy", id))
-  }
+    if (confirm("Are you sure you want to delete?")) {
+        formDelete.delete(route("admin.user.destroy", id));
+    }
 }
+
+const confirm = () => {
+    console.log("Retrieve Records");
+};
 </script>
 
 <template>
-  <LayoutAuthenticated>
-    <Head :title=title />
-    <SectionMain>
-      <SectionTitleLineWithButton
-        :icon="mdiAccountKey"
-        :title=title
-        main
-      >
-        <!-- <BaseButton
-          v-if="can.delete"
-          :route-name="route('admin.user.create')"
-          :icon="mdiPlus"
-          label="Add"
-          color="info"
-          rounded-full
-          small
-        /> -->
-      </SectionTitleLineWithButton>
-      <NotificationBar
-        :key="Date.now()"
-        v-if="$page.props.flash.message"
-        color="success"
-        :icon="mdiAlertBoxOutline"
-      >
-        {{ $page.props.flash.message }}
-      </NotificationBar>
-      <!-- <CardBox class="mb-6" has-table>
-        <form @submit.prevent="form.get(route('admin.user.index'))">
-          <div class="py-2 flex">
-            <div class="flex pl-4">
-              <input
-                type="search"
-                v-model="form.search"
-                class="
-                  rounded-md
-                  shadow-sm
-                  border-gray-300
-                  focus:border-indigo-300
-                  focus:ring
-                  focus:ring-indigo-200
-                  focus:ring-opacity-50
-                "
-                placeholder="Search"
-              />
-              <BaseButton
-                label="Search"
-                type="submit"
-                color="info"
-                class="ml-4 inline-flex items-center px-4 py-2"
-              />
-            </div>
-          </div>
-        </form>
-      </CardBox> -->
-      <CardBox class="mb-6" has-table>
-        <!-- <table>
-          <thead>
-            <tr>
-              <th>
-                <Sort label="Name" attribute="name" />
-              </th>
-              <th>
-                <Sort label="Email" attribute="email" />
-              </th>
-              <th v-if="can.edit || can.delete">Actions</th>
-            </tr>
-          </thead>
+    <LayoutAuthenticated>
+        <Head :title="title" />
+        <SectionMain>
+            <SectionTitleLineWithButton
+                :icon="mdiAccountKey"
+                :title="title"
+                main
+            >
+            </SectionTitleLineWithButton>
+            <NotificationBar
+                :key="Date.now()"
+                v-if="$page.props.flash.message"
+                color="success"
+                :icon="mdiAlertBoxOutline"
+            >
+                {{ $page.props.flash.message }}
+            </NotificationBar>
 
-          <tbody>
-            <tr v-for="user in users.data" :key="user.id">
-              <td data-label="Name">
-                <Link
-                  :href="route('admin.user.show', user.id)"
-                  class="
-                    no-underline
-                    hover:underline
-                    text-cyan-600
-                    dark:text-cyan-400
-                  "
+            <CardBox class="mb-6" has-table>
+                <CoreTable
+                    :table-rows="props.users"
+                    :table-header="headers"
+                    table-name="users"
+                    searchable-fields="email,name"
+                    :is-paginated="true"
                 >
-                  {{ user.name }}
-                </Link>
-              </td>
-              <td data-label="Email">
-                {{ user.email }}
-              </td>
-              <td
-                v-if="can.edit || can.delete"
-                class="before:hidden lg:w-1 whitespace-nowrap"
-              >
-                <BaseButtons type="justify-start lg:justify-end" no-wrap>
-                  <BaseButton
-                    v-if="can.edit"
-                    :route-name="route('admin.user.edit', user.id)"
-                    color="info"
-                    :icon="mdiSquareEditOutline"
-                    small
-                  />
-                  <BaseButton
-                    v-if="can.delete"
-                    color="danger"
-                    :icon="mdiTrashCan"
-                    small
-                    @click="destroy(user.id)"
-                  />
-                </BaseButtons>
-              </td>
-            </tr>
-          </tbody>
-        </table> -->
+                    <template #table-action>
+                        <BaseButton
+                            :icon="mdiPlus"
+                            class="mr-1"
+                            title="Add Asset"
+                            color="whiteDark"
+                            @click="openAddModal"
+                        />
+                    </template>
+                    <template #row-action="slotProp">
+                        <BaseButtons>
+                            <BaseButton
+                                :icon="mdiFileEditOutline"
+                                class="mr-1"
+                                title="Edit"
+                                color="whiteDark"
+                                @click="() => openEditModal(slotProp.slotProp)"
+                            />
+                            <BaseButton
+                                :icon="mdiDeleteCircleOutline"
+                                title="Delete Count"
+                                color="whiteDark"
+                                @click="() => deleteItem(slotProp.slotProp)"
+                            />
+                        </BaseButtons>
+                    </template>
+                </CoreTable>
+            </CardBox>
+        </SectionMain>
+        <CardBoxModal v-model="dialogVisible" :title="editMode ? 'Edit User' : 'Add User'"
+        buttonLabel="Submit" button="info"
+        has-cancel  @click="confirm">
+            <FormField label="Enter Name">
+                <FormControl v-model="name" type="text" placeholder="Name">
+                </FormControl>
+            </FormField>
+            <FormField label="Enter Email">
+                <FormControl v-model="email" type="text" placeholder="Name">
+                </FormControl>
+            </FormField>
 
-        <CoreTable :table-rows="users" :table-header="headers" table-name="cycle-count"
-      searchable-fields="lotnum,itemcode,description,loccode,labelno,countedby" :is-paginated="true">
-      <template #table-action>
-        <BaseButtons>
-          <BaseButton :icon="mdiCloudDownloadOutline" title="Retrieve Records" color="whiteDark" @click="getData" />
-        </BaseButtons>
-      </template>
-      <template #row-action>
-        <BaseButtons>
-          <BaseButton :icon="mdiFileEditOutline" class="mr-1" title="Edit Quantity" color="whiteDark" @click="getData" />
-          <BaseButton :icon="mdiDeleteCircleOutline" title="Delete Count" color="whiteDark" @click="deleteCount()" />
-        </BaseButtons>
-      </template>
-    </CoreTable>
-        <!-- <div class="py-4">
-          <Pagination :data="users" />
-        </div> -->
-      </CardBox>
-    </SectionMain>
-  </LayoutAuthenticated>
+        </CardBoxModal>
+    </LayoutAuthenticated>
 </template>

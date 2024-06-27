@@ -1,15 +1,15 @@
 <script setup>
 import { computed, provide, ref,watch } from "vue";
 import { helpers } from "@/helpers";
-import SortLink from "@/components/SortLink.vue";
-import TableCheckboxCell from "@/components/TableCheckboxCell.vue";
-import BaseLevel from "@/components/BaseLevel.vue";
-import BaseButtons from "@/components/BaseButtons.vue";
-import BaseButton from "@/components/BaseButton.vue";
-import FormControl from "@/components/FormControl.vue";
+import SortLink from "@/Components/SortLink.vue";
+import TableCheckboxCell from "@/Components/TableCheckboxCell.vue";
+import BaseLevel from "@/Components/BaseLevel.vue";
+import BaseButtons from "@/Components/BaseButtons.vue";
+import BaseButton from "@/Components/BaseButton.vue";
+import FormControl from "@/Components/FormControl.vue";
 import { mdiFilterMultipleOutline } from "@mdi/js";
-import FormFieldHorizontal from "@/components/FormFieldHorizontal.vue";
-import CorePaginate from "@/components/CorePaginate.vue";
+import FormFieldHorizontal from "@/Components/FormFieldHorizontal.vue";
+import CorePaginate from "@/Components/CorePaginate.vue";
 import _ from "lodash";
 
 /* key PROPS
@@ -360,7 +360,7 @@ watch(() => _.cloneDeep(props.tableRows),(currentValue, oldValue) => {
 
 <template>
   <div class="flex items-center justify-between">
-    <FormFieldHorizontal class="print:hidden ml-2" v-if="searchableFields">
+    <FormFieldHorizontal class="print:hidden m-5" v-if="searchableFields">
       <FormControl
         v-model="searchedText"
         :icon="mdiFilterMultipleOutline"
